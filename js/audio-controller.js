@@ -81,7 +81,7 @@ const playUsingTonejs = function (midiNote, gain, duration) {
   tonejsInstrument.volume.value = Tone.gainToDb(gain)
 
   Tone.Transport.scheduleOnce(function () {
-    tonejsInstrument.triggerAttackRelease(note, d, Tone.now())
+    tonejsInstrument.triggerAttackRelease(note, d)
   })
 }
 
