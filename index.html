@@ -37,7 +37,9 @@
 <body>
   <header>
     <span>veremin</span><br>
-    <span>a video theremin based on PoseNet</span>
+		<span>видео-терменвокс на основе PoseNet</span><br/>
+		<span>https://ibm.biz/veremin-rus</span>
+
     <span id="v-status"></span>
     <div id="btn-grp">
       <div class="toggle-btn" title="pause veremin">
@@ -72,7 +74,7 @@
         <path d="M29.88 27.52l-13-25a1 1 0 0 0-1.76 0l-13 25a1 1 0 0 0 0 1A1 1 0 0 0 3 29h26a1 1 0 0 0 .86-.49 1 1 0 0 0 .02-.99zM14.88 10h2.25v10h-2.25zM16 26a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 16 26z"></path>
       </svg>
     </button>
-    <div id="msg">loading...</div>
+    <div id="msg">секундочку...</div>
   </div>
 
   <main id="main">
@@ -122,23 +124,22 @@
     <div class="v-slider-container">
       <h2>Veremin</h2>
       <p>
-        A video theremin that allows you to make beautiful
-        music just by waving your arms!
+        Видео-терменвокс, позволяющий сочинить замечательную музыку, просто размахивая руками!
       </p>
 
-      <h2>Usage</h2>
+      <h2>Использование</h2>
       <p>
-        After the video loads, it will include an overlay with skeletal
-        and joint information detected by PoseNet. The overlay also
-        include two adjacent zones/boxes. Move your wrists within each
-        of the zones to make sounds.
+        После загрузки этой страницы вы увидите на экране информацию, извлеченную из видео - ключевые точки тела человека, обнаруженные с помощью нейронной сети PoseNet.
+				Видео разделено на две части - двигайте руками в каждой из них,  чтобы издавать звуки.
+			</p>
+      <p>
+				Перемещайте правую руку вверх и вниз (в правой зоне), чтобы
+						         изменять мелодию.
       </p>
       <p>
-        Move your right hand/arm up and down (in the right zone) to
-        generate different notes.
-      </p>
-      <p>
-        Move your left hand/arm left and right (in the left zone) to adjust the velocity of the note.
+				Перемещайте левую руку вверх и вниз (в левой зоне), чтобы
+		         изменять громкость звука.
+
       </p>
 
       <h2>Requirements</h2>
@@ -188,8 +189,8 @@
   </div>
 
   <footer>
-    from the mind of <a href="https://github.com/johncohn" target="_blank">John Cohn</a> | 
-    in collaboration with <a href="https://github.com/vabarbosa" target="_blank">va barbosa</a> | 
+    from the mind of <a href="https://github.com/johncohn" target="_blank">John Cohn</a> |
+    in collaboration with <a href="https://github.com/vabarbosa" target="_blank">va barbosa</a> |
     fork me on <a href="https://github.com/vabarbosa/veremin" target="_blank">GitHub</a>
   </footer>
 
@@ -198,7 +199,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet@2.1.3"></script>
   <script src="lib/paho-mqtt-min.js"></script>
   <script src="lib/Tone.min.js"></script>
-  
+
   <script type="module" src="js/chord-intervals.js"></script>
   <script type="module" src="js/tonejs-presets.js"></script>
   <script type="module" src="js/canvas-overlay.js"></script>
