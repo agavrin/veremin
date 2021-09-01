@@ -98,7 +98,7 @@ export function drawWave (points, ctx) {
   ctx.moveTo(w, h)
   ctx.lineTo(0, h)
 
-  for (var p = 0; p < len; p++) {
+  for (let p = 0; p < len; p++) {
     const x = scale(p, 0, len - 1, 0, w)
     const y = scale(pts[p], -1, 1, h - m, m)
 
@@ -128,4 +128,14 @@ export function drawScale (x1, y1, x2, y2, interval = 50, ctx, range) {
   if (y2 <= range[1]) {
     drawSegment([y2, x1 - 15], [y2, x2], 'black', 1, ctx, 1)
   }
+}
+
+/**
+ * Draw text on the canvas
+ */
+export function drawText (text, x, y, align = 'start', ctx, color = 'red') {
+  ctx.font = '16px Arial'
+  ctx.textAlign = align
+  ctx.fillStyle = color
+  ctx.fillText(text, x, y)
 }

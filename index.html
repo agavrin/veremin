@@ -32,27 +32,48 @@
   <link rel="stylesheet" type="text/css" href="css/fonts.css">
   <link rel="stylesheet" type="text/css" href="css/veremin.css">
 
-  <title>veremin | видео-терменвокс на основе PoseNet</title>
+  <title>veremin | a video theremin based on PoseNet</title>
 </head>
 <body>
   <header>
     <span>veremin</span><br>
-    <span>видео-терменвокс на основе PoseNet</span><br/>
-		<span>https://ibm.biz/veremin-rus</span>
-    <button id="open-cp-btn" onclick="document.getElementById('control-panel').classList.remove('closed')" title="open control panel">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 12"  height="18" width="24">
-        <path d="M8.05 2a2.5 2.5 0 0 1 4.9 0H16v1h-3.05a2.5 2.5 0 0 1-4.9 0H0V2h8.05zm2.45 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM3.05 9a2.5 2.5 0 0 1 4.9 0H16v1H7.95a2.5 2.5 0 0 1-4.9 0H0V9h3.05zm2.45 2a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z">
-      </svg>
-    </button>
-    <button id="open-info-btn" onclick="document.getElementById('info-panel').classList.remove('closed')"  title="open info">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"  height="18" width="18">
-        <path d="M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"></path>
-        <path d="M9 13H7V7h2z"></path><path d="M7 4a1 1 0 1 1 2 0 1 1 0 1 1-2 0"></path>
-      </svg>
-    </button>
+    <span>a video theremin based on PoseNet</span>
+    <span id="v-status"></span>
+    <div id="btn-grp">
+      <div class="toggle-btn" title="pause veremin">
+        <input class="toggle-btn-input" id="toggle-checkbox" type="checkbox" onchange="toggleVeremin();" checked>
+        <label class="toggle-btn-label" for="toggle-checkbox">
+          <span class="toggle-btn-ui"></span>
+        </label>
+      </div>
+      <button id="open-cp-btn" onclick="document.getElementById('control-panel').classList.remove('closed')" title="open control panel">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"  height="24" width="24">
+          <path d="M30 7h-5.1a5 5 0 0 0-9.8 0H2v2h13.1a5 5 0 0 0 9.8 0H30zm-10 4a3 3 0 1 1 3-3 3 3 0 0 1-3 3zM2 25h5.1a5 5 0 0 0 9.8 0H30v-2H16.9a5 5 0 0 0-9.8 0H2zm7-1a3 3 0 1 1 3 3 3 3 0 0 1-3-3z"></path>
+        </svg>
+      </button>
+      <button id="show-qr-btn" onclick="document.getElementById('qr-panel').classList.remove('closed')" title="show qr code">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"  height="24" width="24">
+          <path d="M29.25 6.76a6 6 0 0 0-8.5 0l1.42 1.42a4 4 0 1 1 5.67 5.67l-8 8a4 4 0 1 1-5.67-5.66l1.41-1.42-1.41-1.42-1.42 1.42a6 6 0 0 0 0 8.5A6 6 0 0 0 17 25a6 6 0 0 0 4.27-1.76l8-8a6 6 0 0 0-.02-8.48z"></path>
+          <path d="M4.19 24.82a4 4 0 0 1 0-5.67l8-8a4 4 0 0 1 5.67 0A3.94 3.94 0 0 1 19 14a4 4 0 0 1-1.17 2.85L15.71 19l1.42 1.42 2.12-2.12a6 6 0 0 0-8.51-8.51l-8 8a6 6 0 0 0 0 8.51A6 6 0 0 0 7 28a6.07 6.07 0 0 0 4.28-1.76l-1.42-1.42a4 4 0 0 1-5.67 0z"></path>
+        </svg>
+      </button>
+      <button id="open-info-btn" onclick="document.getElementById('info-panel').classList.remove('closed')"  title="open info">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"  height="24" width="24">
+          <path d="M17 22v-9h-4v2h2v7h-3v2h8v-2h-3zM16 7a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 16 7z"></path>
+          <path d="M16 30a14 14 0 1 1 14-14 14 14 0 0 1-14 14zm0-26a12 12 0 1 0 12 12A12 12 0 0 0 16 4z"></path>
+        </svg>
+      </button>
+    </div>
   </header>
 
-  <div id="info" class="v-info">секундочку...</div>
+  <div class="v-msg">
+    <button id="open-env-btn" onclick="document.getElementById('env-panel').classList.remove('closed')"  title="open environment info">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"  height="32" width="32">
+        <path d="M29.88 27.52l-13-25a1 1 0 0 0-1.76 0l-13 25a1 1 0 0 0 0 1A1 1 0 0 0 3 29h26a1 1 0 0 0 .86-.49 1 1 0 0 0 .02-.99zM14.88 10h2.25v10h-2.25zM16 26a1.5 1.5 0 1 1 1.5-1.5A1.5 1.5 0 0 1 16 26z"></path>
+      </svg>
+    </button>
+    <div id="msg">loading...</div>
+  </div>
 
   <main id="main">
     <div class="v-wrapper">
@@ -63,44 +84,61 @@
 
   <canvas id="wave"></canvas>
 
-  <div id="control-panel" class="slider closed">
-    <a id="help-cp-link" href="https://github.com/vabarbosa/veremin/blob/master/CONTROLPANEL.md" target="blank" title="control panel guide">
+  <div id="qr-panel" class="v-slider closed">
+    <button id="close-qr-btn" class="close-btn" title="close qr code"
+      onclick="document.getElementById('qr-panel').classList.add('closed')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height="28" width="28">
+        <path fill="#ffffff" d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4l6.6 6.6L8 22.6 9.4 24l6.6-6.6 6.6 6.6 1.4-1.4-6.6-6.6L24 9.4z"/>
+      </svg>
+    </button>
+    <div class="v-slider-container">
+      <h1>ibm.biz/veremin</h1>
+      <img src="img/veremin-qr.png" alt="veremin qr code" />
+    </div>
+  </div>
+
+  <div id="control-panel" class="v-slider closed">
+    <a id="help-cp-link" href="https://github.com/vabarbosa/veremin/blob/main/CONTROLPANEL.md" target="blank" title="control panel guide">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="24" width="24">
         <path fill="#20d5d2" d="M10 17a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm0 1a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"></path>
         <path fill="#20d5d2" d="M10.5 10.5V12h-1V9.5h1a1.5 1.5 0 0 0 0-3h-1A1.5 1.5 0 0 0 8 8H7a2.5 2.5 0 0 1 2.5-2.5h1a2.5 2.5 0 1 1 0 5zM9 14a1 1 0 1 1 2 0 1 1 0 1 1-2 0"></path>
       </svg>
     </a>
-    <button id="close-cp-btn" onclick="document.getElementById('control-panel').classList.add('closed')" title="close control panel">
+    <button id="close-cp-btn" class="close-btn" title="close control panel"
+      onclick="document.getElementById('control-panel').classList.add('closed')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height="28" width="28">
         <path fill="#ffffff" d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4l6.6 6.6L8 22.6 9.4 24l6.6-6.6 6.6 6.6 1.4-1.4-6.6-6.6L24 9.4z"/>
       </svg>
     </button>
   </div>
 
-  <div id="info-panel" class="slider closed">
-    <button id="close-info-btn" onclick="document.getElementById('info-panel').classList.add('closed')"  title="close info">
+  <div id="info-panel" class="v-slider closed">
+    <button id="close-info-btn" class="close-btn" title="close info"
+      onclick="document.getElementById('info-panel').classList.add('closed')">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height="28" width="28">
         <path fill="#ffffff" d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4l6.6 6.6L8 22.6 9.4 24l6.6-6.6 6.6 6.6 1.4-1.4-6.6-6.6L24 9.4z"/>
       </svg>
     </button>
-    <div class="slider-container">
+    <div class="v-slider-container">
       <h2>Veremin</h2>
       <p>
-				Видео-терменвокс, позволяющий сочинить замечательную музыку, просто размахивая руками!
+        A video theremin that allows you to make beautiful
+        music just by waving your arms!
       </p>
 
       <h2>Usage</h2>
       <p>
-				После этой страницы вы увидите на экране информацию, извлеченную из видео - ключевые точки тела человека, обнаруженные с помощью нейронной сети PoseNet.
-				Видео разделено на две части - двигайте руками в каждой из них,  чтобы издавать звуки.
+        After the video loads, it will include an overlay with skeletal
+        and joint information detected by PoseNet. The overlay also
+        include two adjacent zones/boxes. Move your wrists within each
+        of the zones to make sounds.
       </p>
       <p>
-				Перемещайте правую руку вверх и вниз (в правой зоне), чтобы
-		         изменять мелодию.
+        Move your right hand/arm up and down (in the right zone) to
+        generate different notes.
       </p>
       <p>
-				Перемещайте левую руку вверх и вниз (в левой зоне), чтобы
-		         изменять мелодию.
+        Move your left hand/arm left and right (in the left zone) to adjust the velocity of the note.
       </p>
 
       <h2>Requirements</h2>
@@ -114,28 +152,53 @@
         download and run a software synthesizer such as <a href="http://notahat.com/simplesynth/" target="_blank">SimpleSynth</a>.
       </p>
       <p>
+        Also, if you have access to a <a href="https://github.com/mqtt/mqtt.org/wiki/public_brokers" target="blank">MQTT broker that supports WebSockets</a>
+        you can enable and publish the positional data to the broker for other devices or applications to subscribe to.
+      </p>
+      <p>
         Depending on your browser, you may need to access this
         application using the <strong>https</strong> protocol instead
         of the http.
       </p>
       <p>
-        Check out the <a href="https://github.com/vabarbosa/veremin/blob/master/README.md" target="_blank">README</a>
+        Check out the <a href="https://github.com/vabarbosa/veremin/blob/main/README.md" target="_blank">README</a>
         for more information.
+      </p>
+
+      <h2>Environment</h2>
+      <p>
+        <button id="open-env-link" onclick="document.getElementById('env-panel').classList.remove('closed')"  title="open environment info">
+          Check out your browser environment
+        </button>
       </p>
     </div>
   </div>
 
+  <div id="env-panel" class="v-slider closed">
+    <button id="close-env-btn" class="close-btn" title="close environment info"
+      onclick="document.getElementById('env-panel').classList.add('closed')">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" height="28" width="28">
+        <path fill="#ffffff" d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4l6.6 6.6L8 22.6 9.4 24l6.6-6.6 6.6 6.6 1.4-1.4-6.6-6.6L24 9.4z"/>
+      </svg>
+    </button>
+    <div class="v-slider-container">
+      <h2>Environment</h2>
+      <dl id="env-list"> </dl>
+    </div>
+  </div>
+
   <footer>
-    На основе кода <a href="https://github.com/johncohn" target="_blank">John Cohn</a> |
-    в сотрудничестве с <a href="https://github.com/vabarbosa" target="_blank">va barbosa</a> |
-    форкнуть с <a href="https://github.com/vabarbosa/veremin" target="_blank">GitHub</a>
+    from the mind of <a href="https://github.com/johncohn" target="_blank">John Cohn</a> | 
+    in collaboration with <a href="https://github.com/vabarbosa" target="_blank">va barbosa</a> | 
+    fork me on <a href="https://github.com/vabarbosa/veremin" target="_blank">GitHub</a>
   </footer>
 
   <script src="https://unpkg.com/dat.gui"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.13.3"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet@0.2.3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2.10"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet@2.1.3"></script>
+  <script src="lib/paho-mqtt-min.js"></script>
   <script src="lib/Tone.min.js"></script>
-
+  
   <script type="module" src="js/chord-intervals.js"></script>
   <script type="module" src="js/tonejs-presets.js"></script>
   <script type="module" src="js/canvas-overlay.js"></script>

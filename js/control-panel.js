@@ -1,4 +1,4 @@
-/* global dat */
+/* global dat, localStorage, location */
 
 import { getMidiDevices, setPreferredDevice, getBrowserPresets, setPreferredPreset } from './audio-controller.js'
 import { chords } from './chord-intervals.js'
@@ -19,16 +19,15 @@ export let guiState = {
     preset: 'default'
   },
   input: {
-    mobileNetArchitecture: '0.75',
-    outputStride: 16,
-    imageScaleFactor: 0.5
+    architecture: 'MobileNetV1',
+    outputStride: 16
   },
   singlePoseDetection: {
     minPoseConfidence: 0.1,
     minPartConfidence: 0.5
   },
   multiPoseDetection: {
-    maxPoseDetections: 5,
+    maxPoseDetections: 1,
     minPoseConfidence: 0.15,
     minPartConfidence: 0.1,
     nmsRadius: 30.0
@@ -38,14 +37,60 @@ export let guiState = {
     showSkeleton: true,
     showPoints: true,
     showZones: true,
-    showWaveform: true
+    showWaveform: true,
+    showFPS: false
+  },
+  mqtt: {
+    // Turn on publishing of user position data via MQTT
+    on: false,
+    secureWebsocket: true,
+    brokerURL: 'test.mosquitto.org',
+    brokerPort: 8081,
+    eventTopic: 'veremin/{event}',
+    clientId: '',
+    username: '',
+    password: '',
+    cameraFOV: 120,
+    distanceMult: 1,
+    // If MQTT is enabled, subscribe to the topic and log all incoming messages
+    log: false
   }
+}
+
+const storageKey = () => {
+  return `[${location.href.replace(location.protocol, 'veremin:')}]`
+}
+
+const storeState = () => {
+  const stateToSave = Object.assign({}, guiState)
+  // do not store password
+  stateToSave.mqtt.password = ''
+  localStorage.setItem(storageKey(), JSON.stringify(stateToSave))
+}
+const loadState = () => {
+  const savedStateStr = localStorage.getItem(storageKey())
+  const savedStateObj = savedStateStr ? JSON.parse(savedStateStr) : {}
+  guiState = merge(guiState, savedStateObj)
+}
+const merge = (target, source) => {
+  for (const key of Object.keys(source)) {
+    if (source[key] instanceof Object) Object.assign(source[key], merge(target[key], source[key]))
+  }
+  Object.assign(target || {}, source)
+  return target
 }
 
 /**
  * Sets up control panel on the top-right of the window
  */
 export async function setupGui (cameras, mobile, domNode = 'control-panel') {
+  if (typeof (Storage) !== 'undefined') {
+    window.onunload = storeState
+    loadState()
+  } else {
+    console.log('Config state will not be stored')
+  }
+
   if (cameras.length > 0) {
     guiState.camera = cameras[0].deviceId
   }
@@ -59,7 +104,7 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
 
   // Selector for pose detection algorithm.
   // Single-pose algorithm is faster and simpler when only one person to be in the frame. Multi-pose works for more than one person in the frame.
-  const algorithmController = gui.add(guiState, 'algorithm', [ 'multi-pose', 'single-pose' ])
+  const algorithmController = gui.add(guiState, 'algorithm', ['multi-pose', 'single-pose'])
 
   // Get available MIDI output devices
   const midiDevices = await getMidiDevices()
@@ -75,7 +120,7 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
   // Get available chords
   const achords = Object.keys(chords)
   if (achords.length > 0) {
-    let defaultIndex = achords.indexOf(DEFAULTCHORDS)
+    const defaultIndex = achords.indexOf(DEFAULTCHORDS)
     guiState.chordIntervals = defaultIndex >= 0 ? achords[defaultIndex] : achords[0]
   }
 
@@ -103,15 +148,13 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
   const browserPresetController = browserPreset.add(guiState.browser, 'preset', ['default'].concat(binst))
 
   // The input parameters have the most effect on accuracy and speed of the network
-  let input = gui.addFolder('Input')
+  const input = gui.addFolder('Input')
 
-  // Architecture: there are a few PoseNet models varying in size and accuracy.
-  // 1.01 is the largest, but will be the slowest. 0.50 is the fastest, but least accurate.
-  guiState.mobileNetArchitecture = mobile ? '0.50' : '0.75'
+  // Architecture
   const architectureController = input.add(
     guiState.input,
-    'mobileNetArchitecture',
-    ['1.01', '1.00', '0.75', '0.50']
+    'architecture',
+    ['MobileNetV1', 'ResNet50']
   )
 
   // Output stride: affects the height and width of the layers in the neural network.
@@ -119,12 +162,7 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
   // the higher the value the faster the speed but lower the accuracy.
   input.add(guiState.input, 'outputStride', [8, 16, 32])
 
-  // Image scale factor: What to scale the image by before feeding it through the network.
-  input.add(guiState.input, 'imageScaleFactor')
-    .min(0.2)
-    .max(1.0)
-
-  let single = gui.addFolder('Single Pose Detection')
+  const single = gui.addFolder('Single Pose Detection')
 
   // Pose confidence: the overall confidence in the estimation of a person's pose
   single.add(guiState.singlePoseDetection, 'minPoseConfidence', 0.0, 1.0)
@@ -132,10 +170,10 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
   // Min part confidence: the confidence a particular estimated keypoint position is accurate
   single.add(guiState.singlePoseDetection, 'minPartConfidence', 0.0, 1.0)
 
-  let multi = gui.addFolder('Multi Pose Detection')
+  const multi = gui.addFolder('Multi Pose Detection')
   multi.add(guiState.multiPoseDetection, 'maxPoseDetections')
     .min(1)
-    .max(20)
+    .max(10)
     .step(1)
 
   multi.add(guiState.multiPoseDetection, 'minPoseConfidence', 0.0, 1.0)
@@ -149,12 +187,34 @@ export async function setupGui (cameras, mobile, domNode = 'control-panel') {
 
   multi.open()
 
-  let canvas = gui.addFolder('Canvas')
+  const canvas = gui.addFolder('Canvas')
   canvas.add(guiState.canvas, 'showVideo')
   canvas.add(guiState.canvas, 'showSkeleton')
   canvas.add(guiState.canvas, 'showPoints')
   canvas.add(guiState.canvas, 'showZones')
   canvas.add(guiState.canvas, 'showWaveform')
+  canvas.add(guiState.canvas, 'showFPS')
+
+  const mqtt = gui.addFolder('MQTT')
+  mqtt.add(guiState.mqtt, 'on')
+  mqtt.add(guiState.mqtt, 'secureWebsocket')
+  mqtt.add(guiState.mqtt, 'brokerURL')
+  mqtt.add(guiState.mqtt, 'brokerPort')
+  mqtt.add(guiState.mqtt, 'eventTopic')
+  mqtt.add(guiState.mqtt, 'clientId')
+  const un = mqtt.add(guiState.mqtt, 'username')
+  const pwd = mqtt.add(guiState.mqtt, 'password')
+  mqtt.add(guiState.mqtt, 'cameraFOV')
+  mqtt.add(guiState.mqtt, 'distanceMult', 0.25, 4.0)
+  mqtt.add(guiState.mqtt, 'log')
+
+  const unElt = un.domElement.firstChild
+  unElt.name = 'username'
+  const pwdElt = pwd.domElement.firstChild
+  pwdElt.name = 'password'
+  pwdElt.type = 'password'
+
+  mqtt.open()
 
   architectureController.onChange(function (architecture) {
     guiState.changeToArchitecture = architecture

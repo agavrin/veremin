@@ -1,3 +1,13 @@
+![GitHub Action deploy status](https://github.com/vabarbosa/veremin/workflows/deploy%20veremin/badge.svg?branch=main)
+
+<p align="center">
+  <br/>
+  <a href="https://ibm.biz/veremin">
+    <img alt="veremin" src="favicons/veremin.svg" width="70"/>
+  </a>
+  <br/>
+</p>
+
 # Veremin
 
 Veremin is a video theremin based on [PoseNet](https://github.com/tensorflow/tfjs-models/tree/master/posenet) and the brainchild of [John Cohn](https://github.com/johncohn).
@@ -7,6 +17,8 @@ It builds upon the PoseNet [Camera Demo](https://github.com/tensorflow/tfjs-mode
 PoseNet is used to predict the location of your wrists within the video. The app takes the predictions and converts them to tones in the browser or to MIDI values which get sent to a connected MIDI device.
 
 Browsers must allow [access to the webcam](https://caniuse.com/#feat=stream) and support the [Web Audio API](https://caniuse.com/#feat=audio-api). Optionally, to integrate with a MIDI device the browser will need to support the [Web MIDI API](https://caniuse.com/#feat=midi) (e.g., Chrome browser version 43 or later). 
+
+If you would like to use the pose estimation to control another device you can turn on MQTT to publish the data to an MQTT broker (that supports WebSockets). Other devices or application can then subscribe to receive the positional data.
 
 ## Watch the video
 
@@ -19,13 +31,16 @@ Browsers must allow [access to the webcam](https://caniuse.com/#feat=stream) and
 - [Web MIDI API](https://www.w3.org/TR/webmidi) - an API supporting the MIDI protocol, enabling web applications to enumerate and select MIDI input and output devices on the client system and send and receive MIDI messages
 - [Web Audio API](https://www.w3.org/TR/webaudio) - a high-level Web API for processing and synthesizing audio in web applications
 - [Tone.js](https://tonejs.github.io/) - a framework for creating interactive music in the browser
+- [MQTT](https://mqtt.org/) - a lightweight publish/subscribe messaging protocol for communicating with IoT devices
+- [WebSocket API](https://www.w3.org/TR/websockets/) - an interface for sending messages to a server and receive event-driven responses without having to poll the server
+- [Paho JavaScript Client](https://www.eclipse.org/paho/index.php?page=clients/js/index.php) - MQTT client library written in JavaScript that uses WebSockets to connect to an MQTT Broker
 
 
 ## Live demo
 
 To see the Veremin in action without installing anything, simply visit:
 
-https://veremin.mybluemix.net
+https://ibm.biz/veremin
 
 For best results, you may want to use the Chrome browser and have a MIDI synthesizer (hardware or software) connected. See the [Using the app](https://github.com/vabarbosa/veremin#using-the-app) section below for more information.
 
@@ -35,7 +50,7 @@ For best results, you may want to use the Chrome browser and have a MIDI synthes
 Follow one of these steps to deploy your own instance of Veremin.
 
 - [Deploy to IBM Cloud](https://github.com/vabarbosa/veremin#deploy-to-ibm-cloud)
-- [Run locally](https://github.com/vabarbosa/veremin#deploy-to-ibm-cloud)
+- [Run locally](https://github.com/vabarbosa/veremin#run-locally)
 
 ### Deploy to IBM Cloud
 
@@ -123,6 +138,8 @@ In addition, if it supports the [Web MIDI API](https://caniuse.com/#feat=midi), 
 
 If your browser does not support the Web MIDI API or no (hardware or software) synthesizer is detected, the app defaults to using the Web Audio API to generate tones in the browser.
 
+Publishing to an MQTT broker over WebSockets is also possible. You can configure the broker to send messages to. Some keypoints returned by the PoseNet model along with some additional computed values (i.e., distance, angle, etc.) are sent to the broker.
+
 Open your browser and go to the app URL. Depending on your browser, you may need to access the app using the **`https`** protocol instead of the **`http`**. You may also have to accept the browser's prompt to allow access to the web camera. Once access is allowed, the PoseNet model gets loaded (it may take a few seconds).
 
 After the model is loaded, the video stream from the web camera will appear and include an overlay with skeletal and joint information detected by PoseNet. The overlay will also include two adjacent zones/boxes. When your wrists are detected within each of the zones, you should here some sound.
@@ -130,13 +147,15 @@ After the model is loaded, the video stream from the web camera will appear and 
 - Move your right hand/arm up and down (in the right zone) to generate different notes
 - Move your left hand/arm left and right (in the left zone) to adjust the velocity of the note.
 
-Click on the Controls icon (top right) to open the control panel. In the control panel you are able to change MIDI devices (if more than one is connected), configure PoseNet settings, set what is shown in the overlay, and configure additional options. More information about the control panel options is available [here](https://github.com/vabarbosa/veremin/blob/master/CONTROLPANEL.md).
+Click on the Controls icon (top right) to open the control panel. In the control panel you are able to change MIDI devices (if more than one is connected), configure PoseNet settings, set what is shown in the overlay, enable MQTT, and configure additional options. More information about the control panel options is available [here](https://github.com/vabarbosa/veremin/blob/main/CONTROLPANEL.md).
 
 ## Links
 
- - [IBM Cloud](https://console.bluemix.net/)
- - [Getting started with the IBM Cloud CLI](https://console.bluemix.net/docs/cli/index.html#overview)
- - [Prepare the app for deployment - IBM Cloud](https://console.bluemix.net/docs/runtimes/nodejs/getting-started.html#prepare)
+ - [Veremin — A Browser-based Video Theremin](https://medium.com/codait/veremin-a-browser-based-video-theremin-1548b63200c)
  - [Real-time Human Pose Estimation in the Browser with TensorFlow.js](https://medium.com/tensorflow/real-time-human-pose-estimation-in-the-browser-with-tensorflow-js-7dd0bc881cd5)
  - [Playing with MIDI in JavaScript](https://medium.com/swinginc/playing-with-midi-in-javascript-b6999f2913c3)
  - [Introduction to Web Audio API](https://css-tricks.com/introduction-web-audio-api)
+ - [Getting Started with MQTT](https://mqtt.org/getting-started/)
+ - [IBM Cloud](https://console.bluemix.net/)
+ - [Getting started with the IBM Cloud CLI](https://console.bluemix.net/docs/cli/index.html#overview)
+ - [Prepare the app for deployment - IBM Cloud](https://console.bluemix.net/docs/runtimes/nodejs/getting-started.html#prepare)
